@@ -1,8 +1,14 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+import 'package:test_week2/models/communce_model.dart';
+import 'package:test_week2/models/village_model.dart';
+import 'package:test_week2/providers/province_provider.dart';
 import '../components/dropdown_component.dart';
 import '../components/text_field_component.dart';
+import '../models/district_model.dart';
+import '../models/province_model.dart';
 
 class RegisterScreen extends StatefulWidget {
   final String? restorationId;
@@ -24,6 +30,7 @@ class _RegisterScreenState extends State<RegisterScreen> with RestorationMixin {
   String? dropdownValue4;
 
   final List<String> items = ['Option 1', 'Option 2', 'Option 3'];
+  List<String> selectedItems = [];
 
   //----------------------date picker----------------------------------
   final RestorableDateTime _selectedDate =
@@ -87,6 +94,37 @@ class _RegisterScreenState extends State<RegisterScreen> with RestorationMixin {
 
   //----------------------------Image Picker-----------------------------
   File? selectedImage;
+
+  //----------------------Dropdown Change Handling----------------------
+  List<District> filteredDistricts = [];
+  List<Commune> filteredCommunes = [];
+  List<Village> filteredVillages = [];
+
+  void _onDropdownChanged(String? newValue, String type) {
+    setState(() {
+      if (type == 'province') {
+        dropdownValue1 = newValue;
+        dropdownValue2 = null;
+        dropdownValue3 = null;
+        dropdownValue4 = null;
+        filteredDistricts = context.read<ResponseProvider>().getDistrictsByProvince(newValue!);
+        filteredCommunes = [];
+        filteredVillages = [];
+      } else if (type == 'district') {
+        dropdownValue2 = newValue;
+        dropdownValue3 = null;
+        dropdownValue4 = null;
+        filteredCommunes = context.read<ResponseProvider>().getCommunesByDistrict(newValue!);
+        filteredVillages = [];
+      } else if (type == 'commune') {
+        dropdownValue3 = newValue;
+        dropdownValue4 = null;
+        filteredVillages = context.read<ResponseProvider>().getVillagesByCommune(newValue!);
+      } else if (type == 'village') {
+        dropdownValue4 = newValue;
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -230,49 +268,60 @@ class _RegisterScreenState extends State<RegisterScreen> with RestorationMixin {
               style: TextStyle(fontSize: 20),
             ),
             const Divider(),
-            CustomDropdown(
-              labelText: "ខេត្ត",
-              value: dropdownValue1,
-              items: items,
-              onChanged: (String? newValue) {
-                setState(() {
-                  dropdownValue1 = newValue;
-                });
+            Consumer<ResponseProvider>(
+              builder: (context, value, child) {
+                if (value.isLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (value.errorMessage.isNotEmpty) {
+                  return Center(child: Text("Error: ${value.errorMessage}"));
+                } else if (value.provinces.isEmpty) {
+                  return const Center(child: Text("Data is not available"));
+                } else {
+                  List<Province> provinces = value.provinces;
+
+                  return Column(
+                    children: [
+                      CustomDropdown(
+                        labelText: "ខេត្ត",
+                        value: dropdownValue1,
+                        items: provinces.map((province) => province.nameKh).toList(),
+                        onChanged: (String? newValue) {
+                          _onDropdownChanged(newValue, 'province');
+                        },
+                      ),
+                      const SizedBox(height: 20,),
+                      CustomDropdown(
+                        labelText: "ស្រុក",
+                        value: dropdownValue2,
+                        items: filteredDistricts.map((district) => district.nameKh).toList(),
+                        onChanged: (String? newValue) {
+                          _onDropdownChanged(newValue, 'district');
+                        },
+                      ),
+                      const SizedBox(height: 20,),
+                      CustomDropdown(
+                        labelText: "ឃុំ",
+                        value: dropdownValue3,
+                        items: filteredCommunes.map((commune) => commune.nameKh).toList(),
+                        onChanged: (String? newValue) {
+                          _onDropdownChanged(newValue, 'commune');
+                        },
+                      ),
+                      const SizedBox(height: 20,),
+                      CustomDropdown(
+                        labelText: "ភូមិ",
+                        value: dropdownValue4,
+                        items: filteredVillages.map((village) => village.nameKh).toList(),
+                        onChanged: (String? newValue) {
+                          _onDropdownChanged(newValue, 'village');
+                        },
+                      ),
+                    ],
+                  );
+                }
               },
             ),
-            const SizedBox(height: 20),
-            CustomDropdown(
-              labelText: "ស្រុក",
-              value: dropdownValue2,
-              items: items,
-              onChanged: (String? newValue) {
-                setState(() {
-                  dropdownValue2 = newValue;
-                });
-              },
-            ),
-            const SizedBox(height: 20),
-            CustomDropdown(
-              labelText: "ឃុំ",
-              value: dropdownValue3,
-              items: items,
-              onChanged: (String? newValue) {
-                setState(() {
-                  dropdownValue3 = newValue;
-                });
-              },
-            ),
-            const SizedBox(height: 20),
-            CustomDropdown(
-              labelText: "ភូមិ",
-              value: dropdownValue4,
-              items: items,
-              onChanged: (String? newValue) {
-                setState(() {
-                  dropdownValue4 = newValue;
-                });
-              },
-            ),
+
             const SizedBox(height: 30),
             const Text("បង្កើតលេខសម្ងាត់",style: TextStyle(fontSize: 20),),
             const Divider(),
@@ -289,26 +338,28 @@ class _RegisterScreenState extends State<RegisterScreen> with RestorationMixin {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  // print(selectedItems);
+                },
                 child: const Text(
                   "បន្ទាប់",
                   style: TextStyle(color: Colors.white),
                 ),
               ),
             ),
-          ],
+          ],      
         ),
       ),
     );
   }
 
   //-------------------------Image Picker----------------------------
-  Future _pickerImageFromGallery()async{
-    final returnImage= await ImagePicker().pickImage(source: ImageSource.gallery);
+  Future _pickerImageFromGallery() async {
+    final returnImage = await ImagePicker().pickImage(source: ImageSource.gallery);
 
-    if(returnImage==null) return;
+    if (returnImage == null) return;
     setState(() {
-      selectedImage=File(returnImage.path);
+      selectedImage = File(returnImage.path);
     });
   }
 }
