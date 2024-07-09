@@ -27,7 +27,14 @@ class CustomDropdown extends StatelessWidget {
         return InputDecorator(
           decoration: InputDecoration(
             labelText: labelText,
-            errorText: state.errorText,
+            // errorText: TextStyle(color: Colors.black),
+            errorStyle: const TextStyle(color: Colors.black),
+            errorBorder: const OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.black),
+            ),
+            focusedErrorBorder: const OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.black),
+            ),
             border: const OutlineInputBorder(),
           ),
           isEmpty: value == null || value!.isEmpty,

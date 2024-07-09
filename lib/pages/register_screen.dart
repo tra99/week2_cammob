@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -63,23 +65,25 @@ class _RegisterScreenState extends State<RegisterScreen> with RestorationMixin {
   }
 
   @pragma('vm:entry-point')
-  static Route<DateTime> _datePickerRoute(
-    BuildContext context,
-    Object? arguments,
-  ) {
-    return DialogRoute<DateTime>(
-      context: context,
-      builder: (BuildContext context) {
-        return DatePickerDialog(
-          restorationId: 'date_picker_dialog',
-          initialEntryMode: DatePickerEntryMode.calendarOnly,
-          initialDate: DateTime.fromMillisecondsSinceEpoch(arguments! as int),
-          firstDate: DateTime(2021),
-          lastDate: DateTime(2022),
-        );
-      },
-    );
-  }
+    static Route<DateTime> _datePickerRoute(
+      BuildContext context,
+      Object? arguments,
+    ) {
+      DateTime initialDate = DateTime.now();
+
+      return DialogRoute<DateTime>(
+        context: context,
+        builder: (BuildContext context) {
+          return DatePickerDialog(
+            restorationId: 'date_picker_dialog',
+            initialEntryMode: DatePickerEntryMode.calendarOnly,
+            initialDate: initialDate, 
+            firstDate: DateTime(initialDate.year - 50, 1, 1),
+            lastDate: DateTime(initialDate.year + 10, 12, 31), 
+          );
+        },
+      );
+    }
 
   void _selectDate(DateTime? newSelectedDate) {
     if (newSelectedDate != null) {
@@ -87,19 +91,41 @@ class _RegisterScreenState extends State<RegisterScreen> with RestorationMixin {
         _selectedDate.value = newSelectedDate;
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text(
-              'Selected: ${_selectedDate.value.day}/${_selectedDate.value.month}/${_selectedDate.value.year}'),
+              'Selected: ${ _selectedDate.value.year}/${_selectedDate.value.month}/${_selectedDate.value.day}'),
         ));
       });
     }
   }
 
-  //----------------------------Image Picker-----------------------------
-  File? selectedImage;
 
   //----------------------Dropdown Change Handling----------------------
   List<District> filteredDistricts = [];
   List<Commune> filteredCommunes = [];
   List<Village> filteredVillages = [];
+
+  //-----------Convert Image to base64-----------------------
+  File? selectedImage;
+  String base64String = '';
+
+  Future _pickerImageFromGallery() async {
+    final returnImage = await ImagePicker().pickImage(source: ImageSource.gallery);
+
+    if (returnImage == null) return;
+    setState(() {
+      selectedImage = File(returnImage.path);
+    });
+
+    await imageToBase64(File(returnImage.path));
+  }
+
+  Future<void> imageToBase64(File imageFile) async {
+    Uint8List bytes = await imageFile.readAsBytes();
+    String base64String = base64.encode(bytes);
+
+    setState(() {
+      this.base64String = base64String;
+    });
+  }
 
   void _onDropdownChanged(String? newValue, String type) {
     setState(() {
@@ -141,13 +167,6 @@ class _RegisterScreenState extends State<RegisterScreen> with RestorationMixin {
             color: Colors.white,
           ),
         ),
-        leading: GestureDetector(
-          onTap: () {},
-          child: const Icon(
-            Icons.arrow_back,
-            color: Colors.white,
-          ),
-        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -159,6 +178,7 @@ class _RegisterScreenState extends State<RegisterScreen> with RestorationMixin {
             Form(
               key: formKey,
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   CustomTextField(
                     controller: phoneController,
@@ -185,7 +205,7 @@ class _RegisterScreenState extends State<RegisterScreen> with RestorationMixin {
                     ),
                     controller: TextEditingController(
                       text:
-                          '${_selectedDate.value.day}/${_selectedDate.value.month}/${_selectedDate.value.year}',
+                          '${_selectedDate.value.year}/${_selectedDate.value.month}/${_selectedDate.value.day }',
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -252,7 +272,8 @@ class _RegisterScreenState extends State<RegisterScreen> with RestorationMixin {
                               width: 60,
                               height: 60,
                               decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20)),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
                               child: selectedImage != null
                                   ? Image.file(selectedImage!)
                                   : Image.network(
@@ -261,17 +282,17 @@ class _RegisterScreenState extends State<RegisterScreen> with RestorationMixin {
                             ),
                             const SizedBox(width: 20),
                             GestureDetector(
-                              onTap: () {
-                                _pickerImageFromGallery();
-                              },
+                              onTap: _pickerImageFromGallery,
+                            
                               child: const Icon(
                                 Icons.camera_alt_outlined,
                                 size: 32,
+        
                               ),
-                            )
+                            ),
                           ],
                         ),
-                      )
+                      ),
                     ],
                   ),
                   const SizedBox(height: 20),
@@ -396,16 +417,5 @@ class _RegisterScreenState extends State<RegisterScreen> with RestorationMixin {
         ),
       ),
     );
-  }
-
-  //-------------------------Image Picker----------------------------
-  Future _pickerImageFromGallery() async {
-    final returnImage =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
-
-    if (returnImage == null) return;
-    setState(() {
-      selectedImage = File(returnImage.path);
-    });
   }
 }

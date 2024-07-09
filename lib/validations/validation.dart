@@ -2,6 +2,7 @@
 
 //---------------phone number validation-------------------
   final formKey = GlobalKey<FormState>();
+  final formKeyLogin = GlobalKey<FormState>();
   final phoneController = TextEditingController();
 
   String? validatePhoneNumber(String? value) {
