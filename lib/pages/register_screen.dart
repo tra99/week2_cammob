@@ -339,7 +339,7 @@ class _RegisterScreenState extends State<RegisterScreen> with RestorationMixin {
               ),
               child: TextButton(
                 onPressed: () {
-                  // print(selectedItems);
+
                 },
                 child: const Text(
                   "បន្ទាប់",

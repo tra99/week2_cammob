@@ -18,4 +18,12 @@ class ResponseModel {
       dataModel: DataModel.fromJson(json['data']),
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'code': code,
+      'message': message,
+      'data': dataModel.toJson(),
+    };
+  }
 }

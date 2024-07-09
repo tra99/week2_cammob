@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:test_week2/models/communce_model.dart';
 import 'package:test_week2/models/response_model.dart';
 import 'package:test_week2/models/village_model.dart';
@@ -47,11 +49,27 @@ class ResponseProvider with ChangeNotifier {
     try {
       _response = await fetchResponseFromApi();
       _errorMessage = "";
+      await _saveToLocalStorage();
     } catch (e) {
       _errorMessage = e.toString();
+      await _loadFromLocalStorage();
     } finally {
       _isLoading = false;
       notifyListeners();
+    }
+  }
+
+  Future<void> _saveToLocalStorage() async {
+    final prefs = await SharedPreferences.getInstance();
+    final responseJson = json.encode(_response?.toJson());
+    await prefs.setString('response', responseJson);
+  }
+
+  Future<void> _loadFromLocalStorage() async {
+    final prefs = await SharedPreferences.getInstance();
+    final responseJson = prefs.getString('response');
+    if (responseJson != null) {
+      _response = ResponseModel.fromJson(json.decode(responseJson));
     }
   }
 

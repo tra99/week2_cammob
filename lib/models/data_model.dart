@@ -5,8 +5,15 @@ class DataModel {
 
   DataModel({required this.configurationModel});
 
-  factory DataModel.fromJson(Map<String,dynamic>json){
+  factory DataModel.fromJson(Map<String, dynamic> json) {
     return DataModel(
-      configurationModel: ConfigurationModel.fromJson(json['configuration']));
+      configurationModel: ConfigurationModel.fromJson(json['configuration']),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'configuration': configurationModel.toJson(),
+    };
   }
 }
