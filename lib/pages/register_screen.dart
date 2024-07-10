@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:test_week2/models/communce_model.dart';
 import 'package:test_week2/models/register_model.dart';
 import 'package:test_week2/models/village_model.dart';
+import 'package:test_week2/pages/login_screen.dart';
 import 'package:test_week2/providers/response_data_provider.dart';
 import '../components/dropdown_component.dart';
 import '../components/text_field_component.dart';
@@ -177,10 +178,50 @@ class _RegisterScreenState extends State<RegisterScreen> with RestorationMixin {
 
       if (response) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Registration successful')));
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>const LoginScreen()));
       } else {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Registration failed')));
       }
     }
+  }
+
+  Future<void> _pickerImageFromCamera() async {
+    final returnImage = await ImagePicker().pickImage(source: ImageSource.camera);
+    if (returnImage == null) return;
+    setState(() {
+      selectedImage = File(returnImage.path);
+    });
+    await imageToBase64(File(returnImage.path));
+  }
+
+  Future<void> _pickerImage() async {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Wrap(
+            children: <Widget>[
+              ListTile(
+                leading: const Icon(Icons.photo_library),
+                title: const Text('Gallery'),
+                onTap: () {
+                  _pickerImageFromGallery();
+                  Navigator.of(context).pop();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_camera),
+                title: const Text('Camera'),
+                onTap: () {
+                  _pickerImageFromCamera();
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
 
@@ -311,7 +352,7 @@ class _RegisterScreenState extends State<RegisterScreen> with RestorationMixin {
                             ),
                             const SizedBox(width: 20),
                             GestureDetector(
-                              onTap: _pickerImageFromGallery,
+                              onTap: _pickerImage,
                               child: const Icon(
                                 Icons.camera_alt_outlined,
                                 size: 32,
