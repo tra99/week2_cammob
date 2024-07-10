@@ -2,8 +2,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:test_week2/models/communce_model.dart';
+import 'package:test_week2/models/register_model.dart';
 import 'package:test_week2/models/response_model.dart';
 import 'package:test_week2/models/village_model.dart';
+import 'package:test_week2/services/register_service.dart';
 import '../models/district_model.dart';
 import '../models/province_model.dart';
 import '../services/data_info_service.dart';
@@ -17,6 +19,7 @@ class ResponseProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
   String get errorMessage => _errorMessage;
   List<Province> get provinces => _response?.dataModel.configurationModel.provinceList ?? [];
+  final RegisterService _registerService=RegisterService();
 
   List<District> get districts {
     List<District> allDistricts = [];
@@ -40,6 +43,23 @@ class ResponseProvider with ChangeNotifier {
       allVillages.addAll(commune.villages);
     }
     return allVillages;
+  }
+
+  Future<bool> register(RegisterModel data)async{
+    _isLoading=true;
+    notifyListeners();
+
+    final success=await _registerService.register(data);
+
+    _isLoading=false;
+    if(success){
+      _errorMessage="";
+    }
+    else{
+      _errorMessage="Register failed";
+    }
+    notifyListeners();
+    return success;
   }
 
   Future<void> fetchResponse() async {

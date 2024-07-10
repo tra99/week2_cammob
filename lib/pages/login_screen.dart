@@ -1,4 +1,3 @@
-// login_screen.dart
 import 'package:flutter/material.dart';
 import 'package:test_week2/pages/home_screen.dart';
 import 'package:test_week2/pages/register_screen.dart';

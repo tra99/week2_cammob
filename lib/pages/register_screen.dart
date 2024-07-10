@@ -5,8 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:test_week2/models/communce_model.dart';
+import 'package:test_week2/models/register_model.dart';
 import 'package:test_week2/models/village_model.dart';
-import 'package:test_week2/providers/province_provider.dart';
+import 'package:test_week2/providers/response_data_provider.dart';
 import '../components/dropdown_component.dart';
 import '../components/text_field_component.dart';
 import '../models/district_model.dart';
@@ -65,25 +66,25 @@ class _RegisterScreenState extends State<RegisterScreen> with RestorationMixin {
   }
 
   @pragma('vm:entry-point')
-    static Route<DateTime> _datePickerRoute(
-      BuildContext context,
-      Object? arguments,
-    ) {
-      DateTime initialDate = DateTime.now();
+  static Route<DateTime> _datePickerRoute(
+    BuildContext context,
+    Object? arguments,
+  ) {
+    DateTime initialDate = DateTime.now();
 
-      return DialogRoute<DateTime>(
-        context: context,
-        builder: (BuildContext context) {
-          return DatePickerDialog(
-            restorationId: 'date_picker_dialog',
-            initialEntryMode: DatePickerEntryMode.calendarOnly,
-            initialDate: initialDate, 
-            firstDate: DateTime(initialDate.year - 50, 1, 1),
-            lastDate: DateTime(initialDate.year + 10, 12, 31), 
-          );
-        },
-      );
-    }
+    return DialogRoute<DateTime>(
+      context: context,
+      builder: (BuildContext context) {
+        return DatePickerDialog(
+          restorationId: 'date_picker_dialog',
+          initialEntryMode: DatePickerEntryMode.calendarOnly,
+          initialDate: initialDate,
+          firstDate: DateTime(initialDate.year - 50, 1, 1),
+          lastDate: DateTime(initialDate.year + 10, 12, 31),
+        );
+      },
+    );
+  }
 
   void _selectDate(DateTime? newSelectedDate) {
     if (newSelectedDate != null) {
@@ -91,24 +92,19 @@ class _RegisterScreenState extends State<RegisterScreen> with RestorationMixin {
         _selectedDate.value = newSelectedDate;
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text(
-              'Selected: ${ _selectedDate.value.year}/${_selectedDate.value.month}/${_selectedDate.value.day}'),
+              'Selected: ${_selectedDate.value.year}/${_selectedDate.value.month}/${_selectedDate.value.day}'),
         ));
       });
     }
   }
-
-
-  //----------------------Dropdown Change Handling----------------------
-  List<District> filteredDistricts = [];
-  List<Commune> filteredCommunes = [];
-  List<Village> filteredVillages = [];
 
   //-----------Convert Image to base64-----------------------
   File? selectedImage;
   String base64String = '';
 
   Future _pickerImageFromGallery() async {
-    final returnImage = await ImagePicker().pickImage(source: ImageSource.gallery);
+    final returnImage =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
 
     if (returnImage == null) return;
     setState(() {
@@ -126,6 +122,11 @@ class _RegisterScreenState extends State<RegisterScreen> with RestorationMixin {
       this.base64String = base64String;
     });
   }
+
+  //----------------------Dropdown Change Handling----------------------
+  List<District> filteredDistricts = [];
+  List<Commune> filteredCommunes = [];
+  List<Village> filteredVillages = [];
 
   void _onDropdownChanged(String? newValue, String type) {
     setState(() {
@@ -155,6 +156,33 @@ class _RegisterScreenState extends State<RegisterScreen> with RestorationMixin {
       }
     });
   }
+
+  //----------------Register------------------------
+  void _register() async {
+    if (formKey.currentState!.validate()) {
+      final registrationData = RegisterModel(
+        phoneNumber: phoneController.text,
+        fullName: usernameController.text,
+        birthday: _selectedDate.value,
+        gender: _character == SingingCharacter.female ? 'Female' : 'Male',
+        provinceId: context.read<ResponseProvider>().provinces.firstWhere((p) => p.nameKh == dropdownValue1).id,
+        districtId: filteredDistricts.firstWhere((d) => d.nameKh == dropdownValue2).id,
+        communeId: filteredCommunes.firstWhere((c) => c.nameKh == dropdownValue3).id,
+        villageId: filteredVillages.firstWhere((v) => v.nameKh == dropdownValue4).id,
+        password: passwordController.text,
+        nidFile: 'data:image/png;base64,$base64String',
+      );
+
+      final response = await context.read<ResponseProvider>().register(registrationData);
+
+      if (response) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Registration successful')));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Registration failed')));
+      }
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -205,7 +233,7 @@ class _RegisterScreenState extends State<RegisterScreen> with RestorationMixin {
                     ),
                     controller: TextEditingController(
                       text:
-                          '${_selectedDate.value.year}/${_selectedDate.value.month}/${_selectedDate.value.day }',
+                          '${_selectedDate.value.year}/${_selectedDate.value.month}/${_selectedDate.value.day}',
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -265,7 +293,8 @@ class _RegisterScreenState extends State<RegisterScreen> with RestorationMixin {
                             contentPadding: EdgeInsets.all(26)),
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(left: 20, top: 10, bottom: 10),
+                        padding: const EdgeInsets.only(
+                            left: 20, top: 10, bottom: 10),
                         child: Row(
                           children: [
                             Container(
@@ -283,11 +312,9 @@ class _RegisterScreenState extends State<RegisterScreen> with RestorationMixin {
                             const SizedBox(width: 20),
                             GestureDetector(
                               onTap: _pickerImageFromGallery,
-                            
                               child: const Icon(
                                 Icons.camera_alt_outlined,
                                 size: 32,
-        
                               ),
                             ),
                           ],
@@ -306,9 +333,11 @@ class _RegisterScreenState extends State<RegisterScreen> with RestorationMixin {
                       if (value.isLoading) {
                         return const Center(child: CircularProgressIndicator());
                       } else if (value.errorMessage.isNotEmpty) {
-                        return Center(child: Text("Error: ${value.errorMessage}"));
+                        return Center(
+                            child: Text("Error: ${value.errorMessage}"));
                       } else if (value.provinces.isEmpty) {
-                        return const Center(child: Text("Data is not available"));
+                        return const Center(
+                            child: Text("Data is not available"));
                       } else {
                         List<Province> provinces = value.provinces;
 
@@ -386,7 +415,8 @@ class _RegisterScreenState extends State<RegisterScreen> with RestorationMixin {
                     controller: confirmPasswordController,
                     labelText: "បញ្ជាក់លេខសម្ងាត់",
                     keyboardType: TextInputType.visiblePassword,
-                    validator: (value) => validateConfirmPassword(value, passwordController.text),
+                    validator: (value) =>
+                        validateConfirmPassword(value, passwordController.text),
                   ),
                   const SizedBox(height: 40),
                   Container(
@@ -399,10 +429,9 @@ class _RegisterScreenState extends State<RegisterScreen> with RestorationMixin {
                     child: TextButton(
                       onPressed: () {
                         if (formKey.currentState!.validate()) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Form is valid')),
-                          );
+                          
                         }
+                        _register();
                       },
                       child: const Text(
                         "បន្ទាប់",
@@ -412,7 +441,7 @@ class _RegisterScreenState extends State<RegisterScreen> with RestorationMixin {
                   ),
                 ],
               ),
-            ),      
+            ),
           ],
         ),
       ),

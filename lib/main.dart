@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:test_week2/pages/login_screen.dart';
-import 'package:test_week2/providers/province_provider.dart';
-import 'package:test_week2/splashscreen/splash_screen.dart';
+import 'package:test_week2/providers/response_data_provider.dart';
 
-void main() {
+Future<void> main()async {
+  await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
 
