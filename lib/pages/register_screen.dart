@@ -176,7 +176,7 @@ class _RegisterScreenState extends State<RegisterScreen> with RestorationMixin {
 
       final response = await context.read<ResponseProvider>().register(registrationData);
 
-      if (response) {
+      if (response['success']) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Registration successful')));
         Navigator.pushReplacement(
           context,
@@ -185,7 +185,7 @@ class _RegisterScreenState extends State<RegisterScreen> with RestorationMixin {
           ),
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Registration failed')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Registration failed: ${response['message']}')));
       }
     }
   }

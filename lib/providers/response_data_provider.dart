@@ -19,7 +19,7 @@ class ResponseProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
   String get errorMessage => _errorMessage;
   List<Province> get provinces => _response?.dataModel.configurationModel.provinceList ?? [];
-  final RegisterService _registerService=RegisterService();
+  final RegisterService _registerService = RegisterService();
 
   List<District> get districts {
     List<District> allDistricts = [];
@@ -45,21 +45,20 @@ class ResponseProvider with ChangeNotifier {
     return allVillages;
   }
 
-  Future<bool> register(RegisterModel data)async{
-    _isLoading=true;
+  Future<Map<String, dynamic>> register(RegisterModel data) async {
+    _isLoading = true;
     notifyListeners();
 
-    final success=await _registerService.register(data);
+    final response = await _registerService.register(data);
 
-    _isLoading=false;
-    if(success){
-      _errorMessage="";
-    }
-    else{
-      _errorMessage="Register failed";
+    _isLoading = false;
+    if (response['success']) {
+      _errorMessage = "";
+    } else {
+      _errorMessage = "Register failed";
     }
     notifyListeners();
-    return success;
+    return response;
   }
 
   Future<void> fetchResponse() async {

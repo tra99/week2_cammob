@@ -18,7 +18,7 @@ class _PendingScreenState extends State<PendingScreen> {
 
   Future<void> _refresh() async {
     await Future.delayed(const Duration(seconds: 3));
-    _checkRegisterStatus(widget.phoneNumber);
+    await _checkRegisterStatus(widget.phoneNumber);
   }
 
   void _showCustomDialog(String content) {
@@ -38,16 +38,21 @@ class _PendingScreenState extends State<PendingScreen> {
   Future<void> _checkRegisterStatus(String phoneNumber) async {
     try {
       final response = await registerStatusService.checkRegisterStatus(phoneNumber);
-      if (response["data"]["user"]["is_approve"] == true) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const MyHomeScreen()),
-        );
+      if (response != null && response["data"] != null && response["data"]["user"] != null) {
+        if (response["data"]["user"]["is_approve"] == true) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const MyHomeScreen()),
+          );
+        } else {
+          _showCustomDialog('គណនីរបស់អ្នកកំពុងស្ថិតក្នុងស្ថានភាពរងចាំការផ្តល់សិទ្ធ');
+        }
       } else {
-        _showCustomDialog('គណនីរបស់អ្នកកំពុងស្ថិតក្នុងស្ថានភាពរងចាំការផ្តល់សិទ្ធ');
+        _showCustomDialog('ការចុះឈ្មោះបរាជ័យ: Unexpected response format');
       }
     } catch (e) {
-      _showCustomDialog('Failed to check register status: $e');
+      _showCustomDialog('ការចុះឈ្មោះបរាជ័យ: $e');
+      print('ការចុះឈ្មោះបរាជ័យ: $e');
     }
   }
 
