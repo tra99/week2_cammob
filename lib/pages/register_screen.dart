@@ -6,14 +6,14 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:test_week2/models/communce_model.dart';
 import 'package:test_week2/models/register_model.dart';
-import 'package:test_week2/models/village_model.dart';
-import 'package:test_week2/pages/login_screen.dart';
 import 'package:test_week2/providers/response_data_provider.dart';
 import '../components/dropdown_component.dart';
 import '../components/text_field_component.dart';
 import '../models/district_model.dart';
 import '../models/province_model.dart';
+import '../models/village_model.dart';
 import '../validations/validation.dart';
+import 'waiting/pending_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   final String? restorationId;
@@ -178,7 +178,12 @@ class _RegisterScreenState extends State<RegisterScreen> with RestorationMixin {
 
       if (response) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Registration successful')));
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>const LoginScreen()));
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PendingScreen(phoneNumber: phoneController.text),
+          ),
+        );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Registration failed')));
       }
@@ -223,7 +228,6 @@ class _RegisterScreenState extends State<RegisterScreen> with RestorationMixin {
       },
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -447,6 +451,7 @@ class _RegisterScreenState extends State<RegisterScreen> with RestorationMixin {
                   const SizedBox(height: 20),
                   CustomTextField(
                     controller: passwordController,
+                    isPasswordField: true,
                     labelText: "លេខសម្ងាត់",
                     keyboardType: TextInputType.visiblePassword,
                     validator: validatePassword,
@@ -456,6 +461,7 @@ class _RegisterScreenState extends State<RegisterScreen> with RestorationMixin {
                     controller: confirmPasswordController,
                     labelText: "បញ្ជាក់លេខសម្ងាត់",
                     keyboardType: TextInputType.visiblePassword,
+                    isPasswordField: true,
                     validator: (value) =>
                         validateConfirmPassword(value, passwordController.text),
                   ),
@@ -470,9 +476,8 @@ class _RegisterScreenState extends State<RegisterScreen> with RestorationMixin {
                     child: TextButton(
                       onPressed: () {
                         if (formKey.currentState!.validate()) {
-                          
+                          _register();
                         }
-                        _register();
                       },
                       child: const Text(
                         "បន្ទាប់",

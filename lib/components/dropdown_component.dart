@@ -5,6 +5,7 @@ class CustomDropdown extends StatelessWidget {
   final String? value;
   final List<String> items;
   final ValueChanged<String?>? onChanged;
+  final FormFieldValidator<String>? validator;
 
   const CustomDropdown({
     super.key,
@@ -12,12 +13,13 @@ class CustomDropdown extends StatelessWidget {
     this.value,
     required this.items,
     this.onChanged,
+    this.validator,
   });
 
   @override
   Widget build(BuildContext context) {
     return FormField<String>(
-      validator: (value) {
+      validator: validator ?? (value) {
         if (value == null || value.isEmpty) {
           return 'ត្រូវការជ្រើសរើស $labelText';
         }
@@ -27,7 +29,6 @@ class CustomDropdown extends StatelessWidget {
         return InputDecorator(
           decoration: InputDecoration(
             labelText: labelText,
-            // errorText: TextStyle(color: Colors.black),
             errorStyle: const TextStyle(color: Colors.black),
             errorBorder: const OutlineInputBorder(
               borderSide: BorderSide(color: Colors.black),
@@ -36,6 +37,7 @@ class CustomDropdown extends StatelessWidget {
               borderSide: BorderSide(color: Colors.black),
             ),
             border: const OutlineInputBorder(),
+            errorText: state.errorText,
           ),
           isEmpty: value == null || value!.isEmpty,
           child: DropdownButtonHideUnderline(

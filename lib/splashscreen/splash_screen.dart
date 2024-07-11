@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:test_week2/pages/login_screen.dart';
 import 'dart:async';
-
-import 'package:test_week2/pages/register_screen.dart';
 
 class MySplashScreen extends StatefulWidget {
   const MySplashScreen({super.key});
@@ -18,7 +17,7 @@ class _MySplashScreenState extends State<MySplashScreen> {
     super.initState();
     Timer(
       const Duration(seconds: 3),(){
-        Navigator.push(context, MaterialPageRoute(builder: (context)=>const RegisterScreen()));
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>const LoginScreen()));
       }
     );
   }
@@ -30,10 +29,10 @@ class _MySplashScreenState extends State<MySplashScreen> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Center(
+          const Center(
             // child: Image(image: AssetImage("assets/png/coffee_logo.png"),width: 300,height: 300,),
           ),
-          SizedBox(height: 300,),
+          const SizedBox(height: 300,),
           Align(
             alignment: Alignment.bottomCenter,
             child: Center(

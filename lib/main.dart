@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
-import 'package:test_week2/pages/login_screen.dart';
+import 'package:test_week2/pages/register_screen.dart';
 import 'package:test_week2/providers/response_data_provider.dart';
+import 'package:test_week2/splashscreen/splash_screen.dart';
+
+import 'pages/waiting/pending_screen.dart';
 
 Future<void> main()async {
   await dotenv.load(fileName: ".env");
@@ -34,8 +37,8 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
         ),
         debugShowCheckedModeBanner: false,
-        home:   const LoginScreen(),
-        // home:   HomeScreen(),
+        // home:   const PendingScreen(phoneNumber: '010661890',),
+        home:   MySplashScreen(),
       ),
     );
   }
