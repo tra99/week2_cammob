@@ -6,7 +6,7 @@
   final phoneController = TextEditingController();
 
   String? validatePhoneNumber(String? value) {
-    final phoneRegExp = RegExp(r'^[0][0-9]{8,9}$');
+    final phoneRegExp = RegExp(r'^[0][0-9]{5,9}$');
     if (value == null || value.isEmpty) {
       return 'ត្រូវការលេខទូរស័ព្ទ';
     } else if (!phoneRegExp.hasMatch(value)) {

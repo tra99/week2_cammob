@@ -38,11 +38,11 @@ class _CustomTextFieldState extends State<CustomTextField> {
       decoration: InputDecoration(
         labelText: widget.labelText,
         border: const OutlineInputBorder(),
-        errorStyle: const TextStyle(color: Colors.black),
-        errorBorder: const OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
-        focusedErrorBorder: const OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.black),
-        ),
+        // errorStyle: const TextStyle(color: Colors.black),
+        // errorBorder: const OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
+        // focusedErrorBorder: const OutlineInputBorder(
+        //   borderSide: BorderSide(color: Colors.black),
+        // ),
         suffixIcon: widget.isPasswordField
             ? IconButton(
                 icon: Icon(

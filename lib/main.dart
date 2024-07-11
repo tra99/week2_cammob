@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
+import 'package:test_week2/pages/home_screen.dart';
 import 'package:test_week2/pages/register_screen.dart';
 import 'package:test_week2/providers/response_data_provider.dart';
 import 'package:test_week2/splashscreen/splash_screen.dart';
@@ -21,24 +22,24 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_)=>ResponseProvider()..fetchResponse())
       ],
-      child: MaterialApp(
+      child: const MaterialApp(
         title: 'Flutter Demo',
-        theme: ThemeData(
-          inputDecorationTheme: const InputDecorationTheme(
-            errorStyle: TextStyle(color: Colors.black),
-            errorBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.black),
-            ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.black),
-            ),
-          ),
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          useMaterial3: true,
-        ),
+        // theme: ThemeData(
+        //   inputDecorationTheme: const InputDecorationTheme(
+        //     errorStyle: TextStyle(color: Colors.black),
+        //     errorBorder: OutlineInputBorder(
+        //       borderSide: BorderSide(color: Colors.black),
+        //     ),
+        //     focusedErrorBorder: OutlineInputBorder(
+        //       borderSide: BorderSide(color: Colors.black),
+        //     ),
+        //   ),
+        //   colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        //   useMaterial3: true,
+        // ),
         debugShowCheckedModeBanner: false,
         // home:   const PendingScreen(phoneNumber: '010661890',),
-        home:   MySplashScreen(),
+        home:   MyHomeScreen(),
       ),
     );
   }
