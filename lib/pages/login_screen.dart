@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:test_week2/pages/home_screen.dart';
 import 'package:test_week2/pages/register_screen.dart';
+import 'package:test_week2/services/login.dart';
 import '../components/text_field_component.dart';
-import '../services/login.dart';
 import '../validations/validation.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -22,24 +23,20 @@ class _LoginScreenState extends State<LoginScreen> {
     final phone = _phoneNumberController.text;
     final password = _passwordController.text;
 
-    bool isSuccess = await login(phone, password);
+    bool isSuccess = await context.read<LoginProvider>().login(phone, password);
 
     if (isSuccess) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Login Successfully')),
-        );
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const MyHomeScreen()),
-        );
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Login Successfully')),
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const MyHomeScreen()),
+      );
     } else {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Login failed!')),
-        );
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Login failed!')),
+      );
     }
   }
 

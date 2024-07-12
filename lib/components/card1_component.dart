@@ -42,9 +42,9 @@ class CardBelowComponent extends StatelessWidget {
               child: Container(),
             ),
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding:  const EdgeInsets.all(8.0),
               child: Padding(
-                padding: const EdgeInsets.only(left: 20.0),
+                padding:  const EdgeInsets.only(left: 20.0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -56,7 +56,7 @@ class CardBelowComponent extends StatelessWidget {
                     ),
                     Text(
                       text1,
-                      style: const TextStyle(
+                      style:  const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w300,
                         color: Colors.white,
@@ -64,7 +64,7 @@ class CardBelowComponent extends StatelessWidget {
                     ),
                     Text(
                       text2,
-                      style: const TextStyle(
+                      style:  const TextStyle(
                         fontSize: 18,
                         color: Colors.white,
                         fontWeight: FontWeight.w500,

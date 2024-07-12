@@ -1,4 +1,4 @@
-import 'package:test_week2/models/configuration_response_model.dart';
+import 'package:test_week2/models/register_data/configuration_response_model.dart';
 
 class DataModel {
   final ConfigurationModel configurationModel;

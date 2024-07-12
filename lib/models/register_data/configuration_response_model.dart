@@ -1,4 +1,4 @@
-import 'package:test_week2/models/province_model.dart';
+import 'package:test_week2/models/register_data/province_model.dart';
 
 class ConfigurationModel {
 

@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:test_week2/models/register_model.dart';
+import 'package:test_week2/models/register_data/register_model.dart';
 import 'package:test_week2/handle_error/handle_error.dart';
 
 class RegisterService {

@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:test_week2/models/communce_model.dart';
-import 'package:test_week2/models/register_model.dart';
-import 'package:test_week2/models/response_model.dart';
-import 'package:test_week2/models/village_model.dart';
+import 'package:test_week2/models/register_data/communce_model.dart';
+import 'package:test_week2/models/register_data/register_model.dart';
+import 'package:test_week2/models/register_data/response_model.dart';
+import 'package:test_week2/models/register_data/village_model.dart';
 import 'package:test_week2/services/register_service.dart';
-import '../models/district_model.dart';
-import '../models/province_model.dart';
+import '../models/register_data/district_model.dart';
+import '../models/register_data/province_model.dart';
 import '../services/data_info_service.dart';
 
 class ResponseProvider with ChangeNotifier {
